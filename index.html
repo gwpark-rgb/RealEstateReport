@@ -248,7 +248,12 @@
 
             // KPI 업데이트
             document.getElementById('kpi-hotplace').textContent = data.kpi.hotPlace;
-            document.getElementById('kpi-deposit').textContent = data.kpi.avgDeposit + '억원';
+            
+            // 보증금을 만원 단위로 변환 (0.30억 → 3,000만원)
+            const depositInManwon = Math.round(parseFloat(data.kpi.avgDeposit) * 10000);
+            const depositFormatted = depositInManwon.toLocaleString('ko-KR');
+            document.getElementById('kpi-deposit').textContent = depositFormatted + '만원';
+            
             document.getElementById('kpi-monthly').textContent = data.kpi.avgMonthly + '만원';
             document.getElementById('kpi-area').textContent = data.kpi.avgArea + '㎡';
             document.getElementById('title-gu').textContent = gu;
