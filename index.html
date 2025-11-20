@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* 추가 모바일 최적화 */
+        /* 모바일 최적화 */
         * {
             -webkit-tap-highlight-color: transparent;
         }
@@ -23,88 +23,113 @@
             }
         }
         
-        /* 모바일에서 텍스트가 작아지는 것 방지 */
         body {
             -webkit-text-size-adjust: 100%;
             text-size-adjust: 100%;
         }
+        
+        /* 제목이 절대 줄바꿈 안 되도록 */
+        .no-wrap-title {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* KPI 카드 높이 통일 */
+        .kpi-card {
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        @media (max-width: 640px) {
+            .kpi-card {
+                min-height: 120px;
+            }
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100">
-    <div class="min-h-screen p-4 sm:p-8">
+    <div class="min-h-screen p-3 sm:p-6 md:p-8">
         <div class="max-w-6xl mx-auto">
             <!-- 헤더 -->
-            <div class="bg-gradient-to-r from-red-400 to-orange-500 rounded-t-3xl p-4 sm:p-8 text-white shadow-lg">
-                <div class="flex items-center justify-center gap-2 sm:gap-3 mb-2">
-                    <span class="text-2xl sm:text-3xl">📊</span>
-                    <h1 class="text-lg sm:text-2xl md:text-3xl font-bold text-center">강남구/서초구 최근 1개월 문의 데이터 분석</h1>
+            <div class="bg-gradient-to-r from-red-400 to-orange-500 rounded-t-3xl p-4 sm:p-6 md:p-8 text-white shadow-lg">
+                <div class="flex items-center justify-center gap-2 mb-2">
+                    <span class="text-xl sm:text-2xl md:text-3xl flex-shrink-0">📊</span>
+                    <h1 class="text-sm sm:text-lg md:text-2xl lg:text-3xl font-bold text-center leading-tight">
+                        강남구/서초구 최근 1개월 문의 데이터 분석
+                    </h1>
                 </div>
-                <p class="text-center text-white/90 text-xs sm:text-sm md:text-base">2024년 10월 1일 ~ 11월 19일 고객 문의 매물 인사이트</p>
+                <p class="text-center text-white/90 text-xs sm:text-sm">2024년 10월 1일 ~ 11월 19일 고객 문의 매물 인사이트</p>
             </div>
 
             <!-- 구 선택 탭 -->
             <div class="bg-white shadow-lg -mt-4 mx-2 sm:mx-4 rounded-2xl p-2 flex gap-2">
                 <button onclick="switchGu('강남구')" id="btn-강남구" 
-                    class="flex-1 py-2 sm:py-3 rounded-xl font-bold transition-all bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md text-sm sm:text-base">
+                    class="flex-1 py-2.5 sm:py-3 rounded-xl font-bold transition-all bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md text-sm sm:text-base whitespace-nowrap">
                     🏙️ 강남구
                 </button>
                 <button onclick="switchGu('서초구')" id="btn-서초구"
-                    class="flex-1 py-2 sm:py-3 rounded-xl font-bold transition-all bg-gray-100 text-gray-600 hover:bg-gray-200 text-sm sm:text-base">
+                    class="flex-1 py-2.5 sm:py-3 rounded-xl font-bold transition-all bg-gray-100 text-gray-600 hover:bg-gray-200 text-sm sm:text-base whitespace-nowrap">
                     🌳 서초구
                 </button>
             </div>
 
             <!-- 매물 타입 선택 -->
-            <div class="bg-white shadow-md mt-4 mx-2 sm:mx-4 rounded-2xl p-2 flex gap-2">
+            <div class="bg-white shadow-md mt-3 sm:mt-4 mx-2 sm:mx-4 rounded-2xl p-2 flex gap-2">
                 <button onclick="switchType('전체')" id="btn-전체" 
-                    class="flex-1 py-2 rounded-lg font-semibold transition-all bg-indigo-500 text-white shadow-sm text-xs sm:text-sm">
+                    class="flex-1 py-2 rounded-lg font-semibold transition-all bg-indigo-500 text-white shadow-sm text-xs sm:text-sm whitespace-nowrap">
                     📋 전체
                 </button>
                 <button onclick="switchType('상가')" id="btn-상가"
-                    class="flex-1 py-2 rounded-lg font-semibold transition-all bg-gray-100 text-gray-600 hover:bg-gray-200 text-xs sm:text-sm">
+                    class="flex-1 py-2 rounded-lg font-semibold transition-all bg-gray-100 text-gray-600 hover:bg-gray-200 text-xs sm:text-sm whitespace-nowrap">
                     🏪 상가
                 </button>
                 <button onclick="switchType('사무실')" id="btn-사무실"
-                    class="flex-1 py-2 rounded-lg font-semibold transition-all bg-gray-100 text-gray-600 hover:bg-gray-200 text-xs sm:text-sm">
+                    class="flex-1 py-2 rounded-lg font-semibold transition-all bg-gray-100 text-gray-600 hover:bg-gray-200 text-xs sm:text-sm whitespace-nowrap">
                     🏢 사무실
                 </button>
             </div>
 
             <!-- KPI 카드 -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mt-6 sm:mt-8 mb-6 sm:mb-8 px-2 sm:px-4">
-                <div class="bg-gradient-to-br from-orange-400 to-orange-500 rounded-2xl p-4 sm:p-6 text-white shadow-xl transform hover:scale-105 transition-transform">
-                    <div class="text-xl sm:text-2xl mb-1 sm:mb-2">🔥</div>
-                    <div class="text-xs sm:text-sm opacity-90 mb-1">핫플레이스 1위</div>
-                    <div class="text-lg sm:text-2xl font-bold truncate" id="kpi-hotplace">-</div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mt-5 sm:mt-8 mb-5 sm:mb-8 px-2 sm:px-4">
+                <div class="kpi-card bg-gradient-to-br from-orange-400 to-orange-500 rounded-2xl p-3 sm:p-5 text-white shadow-xl transform hover:scale-105 transition-transform">
+                    <div class="text-2xl sm:text-3xl mb-1">🔥</div>
+                    <div class="text-xs sm:text-sm opacity-90 mb-1 whitespace-nowrap">핫플레이스 1위</div>
+                    <div class="text-base sm:text-xl md:text-2xl font-bold truncate" id="kpi-hotplace">-</div>
                 </div>
-                <div class="bg-gradient-to-br from-blue-400 to-blue-500 rounded-2xl p-4 sm:p-6 text-white shadow-xl transform hover:scale-105 transition-transform">
-                    <div class="text-xl sm:text-2xl mb-1 sm:mb-2">💰</div>
-                    <div class="text-xs sm:text-sm opacity-90 mb-1">평균 보증금</div>
-                    <div class="text-lg sm:text-2xl font-bold" id="kpi-deposit">-</div>
+                <div class="kpi-card bg-gradient-to-br from-blue-400 to-blue-500 rounded-2xl p-3 sm:p-5 text-white shadow-xl transform hover:scale-105 transition-transform">
+                    <div class="text-2xl sm:text-3xl mb-1">💰</div>
+                    <div class="text-xs sm:text-sm opacity-90 mb-1 whitespace-nowrap">평균 보증금</div>
+                    <div class="text-base sm:text-xl md:text-2xl font-bold" id="kpi-deposit">-</div>
                 </div>
-                <div class="bg-gradient-to-br from-indigo-400 to-indigo-500 rounded-2xl p-4 sm:p-6 text-white shadow-xl transform hover:scale-105 transition-transform">
-                    <div class="text-xl sm:text-2xl mb-1 sm:mb-2">🏠</div>
-                    <div class="text-xs sm:text-sm opacity-90 mb-1">평균 월세</div>
-                    <div class="text-lg sm:text-2xl font-bold" id="kpi-monthly">-</div>
+                <div class="kpi-card bg-gradient-to-br from-indigo-400 to-indigo-500 rounded-2xl p-3 sm:p-5 text-white shadow-xl transform hover:scale-105 transition-transform">
+                    <div class="text-2xl sm:text-3xl mb-1">🏠</div>
+                    <div class="text-xs sm:text-sm opacity-90 mb-1 whitespace-nowrap">평균 월세</div>
+                    <div class="text-base sm:text-xl md:text-2xl font-bold" id="kpi-monthly">-</div>
                 </div>
-                <div class="bg-gradient-to-br from-purple-400 to-purple-500 rounded-2xl p-4 sm:p-6 text-white shadow-xl transform hover:scale-105 transition-transform">
-                    <div class="text-xl sm:text-2xl mb-1 sm:mb-2">📐</div>
-                    <div class="text-xs sm:text-sm opacity-90 mb-1">평균 면적</div>
-                    <div class="text-lg sm:text-2xl font-bold" id="kpi-area">-</div>
+                <div class="kpi-card bg-gradient-to-br from-purple-400 to-purple-500 rounded-2xl p-3 sm:p-5 text-white shadow-xl transform hover:scale-105 transition-transform">
+                    <div class="text-2xl sm:text-3xl mb-1">📐</div>
+                    <div class="text-xs sm:text-sm opacity-90 mb-1 whitespace-nowrap">평균 면적</div>
+                    <div class="text-base sm:text-xl md:text-2xl font-bold" id="kpi-area">-</div>
                 </div>
             </div>
 
             <!-- 메인 컨텐츠 -->
-            <div class="bg-white rounded-3xl shadow-2xl p-4 sm:p-6 md:p-8 space-y-8 sm:space-y-12">
+            <div class="bg-white rounded-3xl shadow-2xl p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-10">
                 
                 <!-- 핫플레이스 TOP 5 -->
                 <div>
-                    <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center gap-2 flex-wrap">
-                        <span>🗺️</span> <span id="title-gu">강남구</span> <span id="title-type">전체</span> 핫플레이스 TOP 5
+                    <h2 class="text-base sm:text-xl md:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center gap-2">
+                        <span class="flex-shrink-0">🗺️</span> 
+                        <span class="flex-shrink-0" id="title-gu">강남구</span> 
+                        <span class="flex-shrink-0" id="title-type">전체</span> 
+                        <span class="whitespace-nowrap">핫플레이스 TOP 5</span>
                     </h2>
-                    <div class="flex flex-col md:flex-row items-center gap-4 sm:gap-8">
+                    <div class="flex flex-col md:flex-row items-center gap-4 sm:gap-6">
                         <div class="w-full md:w-1/2">
-                            <canvas id="chart-hotplace" width="400" height="300"></canvas>
+                            <canvas id="chart-hotplace"></canvas>
                         </div>
                         <div class="w-full md:w-1/2" id="hotplace-list">
                             <!-- 동적 생성 -->
@@ -114,44 +139,50 @@
 
                 <!-- 보증금 구간별 -->
                 <div>
-                    <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center gap-2">
-                        <span>💰</span> 보증금 구간별 분석
+                    <h2 class="text-base sm:text-xl md:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center gap-2">
+                        <span>💰</span> <span class="whitespace-nowrap">보증금 구간별 분석</span>
                     </h2>
-                    <canvas id="chart-deposit" height="100"></canvas>
+                    <div class="h-64 sm:h-80">
+                        <canvas id="chart-deposit"></canvas>
+                    </div>
                 </div>
 
                 <!-- 월세 구간별 -->
                 <div>
-                    <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center gap-2">
-                        <span>📊</span> 월세 구간별 분석
+                    <h2 class="text-base sm:text-xl md:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center gap-2">
+                        <span>📊</span> <span class="whitespace-nowrap">월세 구간별 분석</span>
                     </h2>
-                    <canvas id="chart-monthly" height="100"></canvas>
+                    <div class="h-64 sm:h-80">
+                        <canvas id="chart-monthly"></canvas>
+                    </div>
                 </div>
 
                 <!-- 권리금 구간별 -->
                 <div>
-                    <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center gap-2">
-                        <span>💎</span> 권리금 구간별 분석
+                    <h2 class="text-base sm:text-xl md:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center gap-2">
+                        <span>💎</span> <span class="whitespace-nowrap">권리금 구간별 분석</span>
                     </h2>
-                    <canvas id="chart-premium" height="100"></canvas>
+                    <div class="h-64 sm:h-80">
+                        <canvas id="chart-premium"></canvas>
+                    </div>
                 </div>
 
                 <!-- 평수대별 -->
                 <div>
-                    <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center gap-2">
-                        <span>📐</span> 평수대별 선호도
+                    <h2 class="text-base sm:text-xl md:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center gap-2">
+                        <span>📐</span> <span class="whitespace-nowrap">평수대별 선호도</span>
                     </h2>
                     <div class="flex justify-center">
-                        <div class="w-full max-w-md" style="height: 300px;">
+                        <div class="w-full max-w-md h-64 sm:h-80">
                             <canvas id="chart-area"></canvas>
                         </div>
                     </div>
                 </div>
 
                 <!-- 인사이트 및 매물 등록 전략 -->
-                <div class="mt-8 sm:mt-12">
-                    <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center gap-2">
-                        <span>💡</span> 인사이트 및 매물 등록 전략
+                <div class="mt-6 sm:mt-10">
+                    <h2 class="text-base sm:text-xl md:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center gap-2">
+                        <span>💡</span> <span class="whitespace-nowrap">인사이트 및 매물 등록 전략</span>
                     </h2>
                     <div class="space-y-4" id="insights-content">
                         <!-- 동적 생성 -->
@@ -162,10 +193,7 @@
     </div>
 
     <script>
-        // ========================================
-        // 🔒 보안 처리: 미리 계산된 통계 데이터만 저장
-        // 원본 CSV 데이터는 제거됨
-        // ========================================
+        // 🔒 보안: 미리 계산된 통계 데이터만 저장
         const PRECOMPUTED_DATA = {
             "강남구": {
                 "전체": {"kpi":{"hotPlace":"역삼동","avgDeposit":"0.30","avgMonthly":227,"avgArea":92},"topDongs":[{"name":"역삼동","percentage":23.7},{"name":"논현동","percentage":20.0},{"name":"신사동","percentage":14.8},{"name":"삼성동","percentage":10.3},{"name":"청담동","percentage":7.4}],"depositRanges":[{"range":"0-1,000만원","count":89,"percentage":13.5},{"range":"1,000-3,000만원","count":278,"percentage":42.3},{"range":"3,000-5,000만원","count":160,"percentage":24.3},{"range":"5,000-1억원","count":103,"percentage":15.7},{"range":"1억원 이상","count":27,"percentage":4.1}],"monthlyRanges":[{"range":"0-100만원","count":63,"percentage":9.6},{"range":"100-200만원","count":268,"percentage":40.8},{"range":"200-300만원","count":160,"percentage":24.3},{"range":"300-500만원","count":103,"percentage":15.7},{"range":"500만원 이상","count":63,"percentage":9.6}],"premiumRanges":[{"range":"권리금 없음","count":0,"percentage":0.0},{"range":"0-3,000만원","count":626,"percentage":95.3},{"range":"3,000-5,000만원","count":14,"percentage":2.1},{"range":"5,000-1억원","count":13,"percentage":2.0},{"range":"1억원 이상","count":4,"percentage":0.6}],"areaRanges":[{"name":"10평 미만","count":82,"percentage":12.5},{"name":"10-20평","count":249,"percentage":37.9},{"name":"20-30평","count":110,"percentage":16.7},{"name":"30-50평","count":144,"percentage":21.9},{"name":"50평 이상","count":72,"percentage":11.0}]},
@@ -183,7 +211,6 @@
         let currentType = '전체';
         let charts = {};
 
-        // 데이터 로드
         function loadData() {
             if (typeof ChartDataLabels !== 'undefined') {
                 Chart.register(ChartDataLabels);
@@ -194,11 +221,11 @@
         function switchGu(gu) {
             currentGu = gu;
             document.getElementById('btn-강남구').className = gu === '강남구' 
-                ? 'flex-1 py-2 sm:py-3 rounded-xl font-bold transition-all bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md text-sm sm:text-base'
-                : 'flex-1 py-2 sm:py-3 rounded-xl font-bold transition-all bg-gray-100 text-gray-600 hover:bg-gray-200 text-sm sm:text-base';
+                ? 'flex-1 py-2.5 sm:py-3 rounded-xl font-bold transition-all bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md text-sm sm:text-base whitespace-nowrap'
+                : 'flex-1 py-2.5 sm:py-3 rounded-xl font-bold transition-all bg-gray-100 text-gray-600 hover:bg-gray-200 text-sm sm:text-base whitespace-nowrap';
             document.getElementById('btn-서초구').className = gu === '서초구'
-                ? 'flex-1 py-2 sm:py-3 rounded-xl font-bold transition-all bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md text-sm sm:text-base'
-                : 'flex-1 py-2 sm:py-3 rounded-xl font-bold transition-all bg-gray-100 text-gray-600 hover:bg-gray-200 text-sm sm:text-base';
+                ? 'flex-1 py-2.5 sm:py-3 rounded-xl font-bold transition-all bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md text-sm sm:text-base whitespace-nowrap'
+                : 'flex-1 py-2.5 sm:py-3 rounded-xl font-bold transition-all bg-gray-100 text-gray-600 hover:bg-gray-200 text-sm sm:text-base whitespace-nowrap';
             renderData(gu, currentType);
         }
 
@@ -206,8 +233,8 @@
             currentType = type;
             ['전체', '상가', '사무실'].forEach(t => {
                 document.getElementById(`btn-${t}`).className = t === type
-                    ? 'flex-1 py-2 rounded-lg font-semibold transition-all bg-indigo-500 text-white shadow-sm text-xs sm:text-sm'
-                    : 'flex-1 py-2 rounded-lg font-semibold transition-all bg-gray-100 text-gray-600 hover:bg-gray-200 text-xs sm:text-sm';
+                    ? 'flex-1 py-2 rounded-lg font-semibold transition-all bg-indigo-500 text-white shadow-sm text-xs sm:text-sm whitespace-nowrap'
+                    : 'flex-1 py-2 rounded-lg font-semibold transition-all bg-gray-100 text-gray-600 hover:bg-gray-200 text-xs sm:text-sm whitespace-nowrap';
             });
             renderData(currentGu, type);
         }
@@ -230,27 +257,23 @@
             // 핫플레이스 리스트
             const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#96CEB4'];
             document.getElementById('hotplace-list').innerHTML = data.topDongs.map((item, idx) => `
-                <div class="flex items-center justify-between p-2 sm:p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors mb-2 sm:mb-3">
+                <div class="flex items-center justify-between p-2.5 sm:p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors mb-2">
                     <div class="flex items-center gap-2 sm:gap-3">
-                        <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white font-bold text-sm sm:text-base" 
+                        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0" 
                              style="background-color: ${colors[idx]}">
                             ${idx + 1}
                         </div>
-                        <span class="font-semibold text-sm sm:text-base md:text-lg">${item.name}</span>
+                        <span class="font-semibold text-sm sm:text-base">${item.name}</span>
                     </div>
-                    <span class="text-lg sm:text-xl md:text-2xl font-bold text-gray-700">${item.percentage}%</span>
+                    <span class="text-lg sm:text-xl font-bold text-gray-700 flex-shrink-0">${item.percentage}%</span>
                 </div>
             `).join('');
 
-            // 차트 렌더링
             renderCharts(data, colors);
-
-            // 인사이트 생성
             generateInsights(data, gu, type);
         }
 
         function renderCharts(data, colors) {
-            // 기존 차트 파괴
             Object.values(charts).forEach(chart => chart?.destroy());
 
             // 핫플레이스 도넛 차트
@@ -272,14 +295,17 @@
                     plugins: {
                         legend: { 
                             position: 'bottom',
-                            labels: { font: { size: 12 } }
+                            labels: { 
+                                font: { size: 11 },
+                                padding: 10
+                            }
                         },
                         tooltip: {
                             enabled: true,
                             displayColors: false,
                             padding: 12,
-                            titleFont: { size: 16 },
-                            bodyFont: { size: 16 },
+                            titleFont: { size: 14 },
+                            bodyFont: { size: 14 },
                             callbacks: {
                                 title: () => '',
                                 label: (context) => `${context.label}: ${context.parsed}%`
@@ -289,7 +315,7 @@
                             color: '#fff',
                             font: {
                                 weight: 'bold',
-                                size: 13
+                                size: 11
                             },
                             formatter: (value, context) => {
                                 if (hotplaceHovering) return '';
@@ -326,15 +352,15 @@
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         legend: { display: false },
                         tooltip: {
                             enabled: true,
                             displayColors: false,
-                            padding: 12,
-                            titleFont: { size: 16 },
-                            bodyFont: { size: 16 },
+                            padding: 10,
+                            titleFont: { size: 13 },
+                            bodyFont: { size: 13 },
                             callbacks: {
                                 title: () => '',
                                 label: (context) => `${context.label}: ${context.parsed.y.toFixed(1)}%`
@@ -344,7 +370,7 @@
                             color: '#fff',
                             font: {
                                 weight: 'bold',
-                                size: 12
+                                size: 11
                             },
                             formatter: (value) => {
                                 if (depositHovering) return '';
@@ -355,10 +381,20 @@
                     scales: {
                         y: { 
                             beginAtZero: true, 
-                            title: { display: true, text: '비율 (%)' },
-                            ticks: { font: { size: 11 } }
+                            title: { 
+                                display: true, 
+                                text: '비율 (%)',
+                                font: { size: 11 }
+                            },
+                            ticks: { font: { size: 10 } }
                         },
-                        x: { ticks: { font: { size: 11 } } }
+                        x: { 
+                            ticks: { 
+                                font: { size: 9 },
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
+                        }
                     }
                 }
             });
@@ -391,15 +427,15 @@
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         legend: { display: false },
                         tooltip: {
                             enabled: true,
                             displayColors: false,
-                            padding: 12,
-                            titleFont: { size: 16 },
-                            bodyFont: { size: 16 },
+                            padding: 10,
+                            titleFont: { size: 13 },
+                            bodyFont: { size: 13 },
                             callbacks: {
                                 title: () => '',
                                 label: (context) => `${context.label}: ${context.parsed.y.toFixed(1)}%`
@@ -409,7 +445,7 @@
                             color: '#059669',
                             font: {
                                 weight: 'bold',
-                                size: 12
+                                size: 11
                             },
                             formatter: (value) => {
                                 if (monthlyHovering) return '';
@@ -423,10 +459,20 @@
                         y: { 
                             beginAtZero: true, 
                             max: 50,
-                            title: { display: true, text: '비율 (%)' },
-                            ticks: { font: { size: 11 } }
+                            title: { 
+                                display: true, 
+                                text: '비율 (%)',
+                                font: { size: 11 }
+                            },
+                            ticks: { font: { size: 10 } }
                         },
-                        x: { ticks: { font: { size: 11 } } }
+                        x: { 
+                            ticks: { 
+                                font: { size: 9 },
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
+                        }
                     }
                 }
             });
@@ -456,15 +502,15 @@
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         legend: { display: false },
                         tooltip: {
                             enabled: true,
                             displayColors: false,
-                            padding: 12,
-                            titleFont: { size: 16 },
-                            bodyFont: { size: 16 },
+                            padding: 10,
+                            titleFont: { size: 13 },
+                            bodyFont: { size: 13 },
                             callbacks: {
                                 title: () => '',
                                 label: (context) => `${context.label}: ${context.parsed.y.toFixed(1)}%`
@@ -476,7 +522,7 @@
                             },
                             font: {
                                 weight: 'bold',
-                                size: 12
+                                size: 11
                             },
                             anchor: (context) => {
                                 return context.dataset.data[context.dataIndex] <= 5 ? 'end' : 'center';
@@ -494,13 +540,23 @@
                         y: { 
                             beginAtZero: true,
                             max: 100,
-                            title: { display: true, text: '비율 (%)' },
+                            title: { 
+                                display: true, 
+                                text: '비율 (%)',
+                                font: { size: 11 }
+                            },
                             ticks: { 
-                                font: { size: 11 },
+                                font: { size: 10 },
                                 stepSize: 20
                             }
                         },
-                        x: { ticks: { font: { size: 11 } } }
+                        x: { 
+                            ticks: { 
+                                font: { size: 9 },
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
+                        }
                     }
                 }
             });
@@ -529,18 +585,21 @@
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         legend: { 
                             position: 'bottom',
-                            labels: { font: { size: 12 } }
+                            labels: { 
+                                font: { size: 11 },
+                                padding: 10
+                            }
                         },
                         tooltip: {
                             enabled: true,
                             displayColors: false,
-                            padding: 12,
-                            titleFont: { size: 16 },
-                            bodyFont: { size: 16 },
+                            padding: 10,
+                            titleFont: { size: 13 },
+                            bodyFont: { size: 13 },
                             callbacks: {
                                 title: () => '',
                                 label: (context) => `${context.label}: ${context.parsed}%`
@@ -550,7 +609,7 @@
                             color: '#fff',
                             font: {
                                 weight: 'bold',
-                                size: 13
+                                size: 11
                             },
                             formatter: (value, context) => {
                                 if (areaHovering) return '';
@@ -587,34 +646,34 @@
             const typeText = type === '전체' ? '상가와 사무실' : type;
             
             const insightHTML = `
-                <div class="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl p-4 sm:p-6 md:p-8 text-white shadow-2xl">
-                    <div class="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
-                        <div class="text-3xl sm:text-4xl md:text-5xl">🎯</div>
-                        <div class="flex-1">
-                            <h3 class="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">매물 등록 우선순위</h3>
-                            <div class="space-y-2 sm:space-y-3 text-sm sm:text-base md:text-lg">
+                <div class="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl p-4 sm:p-6 text-white shadow-2xl">
+                    <div class="flex flex-col sm:flex-row items-start gap-3 sm:gap-5">
+                        <div class="text-3xl sm:text-4xl flex-shrink-0">🎯</div>
+                        <div class="flex-1 w-full">
+                            <h3 class="text-lg sm:text-xl md:text-2xl font-bold mb-3">매물 등록 우선순위</h3>
+                            <div class="space-y-2 sm:space-y-3 text-sm sm:text-base">
                                 <p class="leading-relaxed">
                                     <strong>${gu} ${typeText}</strong> 매물 등록 시 아래 조건을 최우선으로 확보하세요.
                                 </p>
                                 <div class="bg-white/10 rounded-xl p-3 sm:p-4 space-y-2">
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-xl sm:text-2xl flex-shrink-0">📍</span>
-                                        <span class="text-sm sm:text-base"><strong>지역:</strong> ${topDong.name} (${topDong.percentage}% 문의율)</span>
+                                    <div class="flex items-start gap-2">
+                                        <span class="text-xl flex-shrink-0">📍</span>
+                                        <span class="text-xs sm:text-sm"><strong>지역:</strong> ${topDong.name} (${topDong.percentage}% 문의율)</span>
                                     </div>
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-xl sm:text-2xl flex-shrink-0">📐</span>
-                                        <span class="text-sm sm:text-base"><strong>평수:</strong> ${topArea.name} (${topArea.percentage.toFixed(1)}% 선호)</span>
+                                    <div class="flex items-start gap-2">
+                                        <span class="text-xl flex-shrink-0">📐</span>
+                                        <span class="text-xs sm:text-sm"><strong>평수:</strong> ${topArea.name} (${topArea.percentage.toFixed(1)}% 선호)</span>
                                     </div>
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-xl sm:text-2xl flex-shrink-0">💰</span>
-                                        <span class="text-sm sm:text-base"><strong>보증금:</strong> ${topDeposit.range} (${topDeposit.percentage.toFixed(1)}% 문의)</span>
+                                    <div class="flex items-start gap-2">
+                                        <span class="text-xl flex-shrink-0">💰</span>
+                                        <span class="text-xs sm:text-sm"><strong>보증금:</strong> ${topDeposit.range} (${topDeposit.percentage.toFixed(1)}% 문의)</span>
                                     </div>
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-xl sm:text-2xl flex-shrink-0">🏠</span>
-                                        <span class="text-sm sm:text-base"><strong>월세:</strong> ${topMonthly.range} (${topMonthly.percentage.toFixed(1)}% 문의)</span>
+                                    <div class="flex items-start gap-2">
+                                        <span class="text-xl flex-shrink-0">🏠</span>
+                                        <span class="text-xs sm:text-sm"><strong>월세:</strong> ${topMonthly.range} (${topMonthly.percentage.toFixed(1)}% 문의)</span>
                                     </div>
                                 </div>
-                                <p class="text-white/90 mt-3 sm:mt-4 text-sm sm:text-base">
+                                <p class="text-white/90 mt-3 text-xs sm:text-sm leading-relaxed">
                                     위 조건의 조합이 가장 높은 수요를 보이며, 빠른 성약을 기대할 수 있습니다.
                                 </p>
                             </div>
@@ -626,7 +685,6 @@
             document.getElementById('insights-content').innerHTML = insightHTML;
         }
 
-        // 페이지 로드 시 실행
         window.addEventListener('DOMContentLoaded', loadData);
     </script>
 </body>
