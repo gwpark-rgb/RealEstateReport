@@ -172,12 +172,9 @@
                     <h2 class="text-base sm:text-xl md:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center gap-2">
                         <span>📐</span> <span class="whitespace-nowrap">평수대별 선호도</span>
                     </h2>
-                    <div class="flex flex-col md:flex-row items-center gap-4 sm:gap-6">
+                    <div class="flex justify-center items-center">
                         <div class="w-full md:w-1/2">
                             <canvas id="chart-area"></canvas>
-                        </div>
-                        <div class="w-full md:w-1/2">
-                            <!-- 평수대별 추가 정보가 필요하면 여기에 추가 가능 -->
                         </div>
                     </div>
                 </div>
@@ -286,9 +283,6 @@
             const hotplaceCanvas = document.getElementById('chart-hotplace');
             let hotplaceHovering = false;
             
-            // 모바일 감지
-            const isMobile = window.innerWidth < 768;
-            
             charts.hotplace = new Chart(hotplaceCanvas, {
                 type: 'doughnut',
                 data: {
@@ -336,22 +330,17 @@
                 }
             });
             
-            // 데스크톱에서만 호버 효과, 모바일에서는 터치 후 복구
-            if (!isMobile) {
-                hotplaceCanvas.addEventListener('mouseenter', () => {
+            // 호버 시 레이블 숨김 처리
+            hotplaceCanvas.addEventListener('mousemove', () => {
+                if (!hotplaceHovering) {
                     hotplaceHovering = true;
                     charts.hotplace.update('none');
-                });
-                hotplaceCanvas.addEventListener('mouseleave', () => {
-                    hotplaceHovering = false;
-                    charts.hotplace.update('none');
-                });
-            } else {
-                hotplaceCanvas.addEventListener('touchend', () => {
-                    hotplaceHovering = false;
-                    charts.hotplace.update('none');
-                });
-            }
+                }
+            });
+            hotplaceCanvas.addEventListener('mouseleave', () => {
+                hotplaceHovering = false;
+                charts.hotplace.update('none');
+            });
 
             // 보증금 바 차트
             const depositCanvas = document.getElementById('chart-deposit');
@@ -408,29 +397,25 @@
                         x: { 
                             ticks: { 
                                 font: { size: 9 },
-                                maxRotation: 45,
-                                minRotation: 45
+                                maxRotation: 0,
+                                minRotation: 0,
+                                autoSkip: false
                             }
                         }
                     }
                 }
             });
             
-            if (!isMobile) {
-                depositCanvas.addEventListener('mouseenter', () => {
+            depositCanvas.addEventListener('mousemove', () => {
+                if (!depositHovering) {
                     depositHovering = true;
                     charts.deposit.update('none');
-                });
-                depositCanvas.addEventListener('mouseleave', () => {
-                    depositHovering = false;
-                    charts.deposit.update('none');
-                });
-            } else {
-                depositCanvas.addEventListener('touchend', () => {
-                    depositHovering = false;
-                    charts.deposit.update('none');
-                });
-            }
+                }
+            });
+            depositCanvas.addEventListener('mouseleave', () => {
+                depositHovering = false;
+                charts.deposit.update('none');
+            });
 
             // 월세 라인 차트
             const monthlyCanvas = document.getElementById('chart-monthly');
@@ -493,29 +478,24 @@
                         x: { 
                             ticks: { 
                                 font: { size: 9 },
-                                maxRotation: 45,
-                                minRotation: 45
+                                maxRotation: 0,
+                                minRotation: 0
                             }
                         }
                     }
                 }
             });
             
-            if (!isMobile) {
-                monthlyCanvas.addEventListener('mouseenter', () => {
+            monthlyCanvas.addEventListener('mousemove', () => {
+                if (!monthlyHovering) {
                     monthlyHovering = true;
                     charts.monthly.update('none');
-                });
-                monthlyCanvas.addEventListener('mouseleave', () => {
-                    monthlyHovering = false;
-                    charts.monthly.update('none');
-                });
-            } else {
-                monthlyCanvas.addEventListener('touchend', () => {
-                    monthlyHovering = false;
-                    charts.monthly.update('none');
-                });
-            }
+                }
+            });
+            monthlyCanvas.addEventListener('mouseleave', () => {
+                monthlyHovering = false;
+                charts.monthly.update('none');
+            });
 
             // 권리금 바 차트
             const premiumCanvas = document.getElementById('chart-premium');
@@ -584,29 +564,24 @@
                         x: { 
                             ticks: { 
                                 font: { size: 9 },
-                                maxRotation: 45,
-                                minRotation: 45
+                                maxRotation: 0,
+                                minRotation: 0
                             }
                         }
                     }
                 }
             });
             
-            if (!isMobile) {
-                premiumCanvas.addEventListener('mouseenter', () => {
+            premiumCanvas.addEventListener('mousemove', () => {
+                if (!premiumHovering) {
                     premiumHovering = true;
                     charts.premium.update('none');
-                });
-                premiumCanvas.addEventListener('mouseleave', () => {
-                    premiumHovering = false;
-                    charts.premium.update('none');
-                });
-            } else {
-                premiumCanvas.addEventListener('touchend', () => {
-                    premiumHovering = false;
-                    charts.premium.update('none');
-                });
-            }
+                }
+            });
+            premiumCanvas.addEventListener('mouseleave', () => {
+                premiumHovering = false;
+                charts.premium.update('none');
+            });
 
             // 평수대별 도넛 차트
             const areaCanvas = document.getElementById('chart-area');
@@ -623,7 +598,7 @@
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,
+                    maintainAspectRatio: true,
                     plugins: {
                         legend: { 
                             position: 'bottom',
@@ -659,21 +634,16 @@
                 }
             });
             
-            if (!isMobile) {
-                areaCanvas.addEventListener('mouseenter', () => {
+            areaCanvas.addEventListener('mousemove', () => {
+                if (!areaHovering) {
                     areaHovering = true;
                     charts.area.update('none');
-                });
-                areaCanvas.addEventListener('mouseleave', () => {
-                    areaHovering = false;
-                    charts.area.update('none');
-                });
-            } else {
-                areaCanvas.addEventListener('touchend', () => {
-                    areaHovering = false;
-                    charts.area.update('none');
-                });
-            }
+                }
+            });
+            areaCanvas.addEventListener('mouseleave', () => {
+                areaHovering = false;
+                charts.area.update('none');
+            });
         }
 
         function generateInsights(data, gu, type) {
